@@ -68,7 +68,7 @@ fun filterMove (coordinates:String) : MutableList<Int> {
     for (i in coordinates.indices) {
         when {
             coordinates[i].isDigit()-> listMoveDigit.add(coordinates[i])
-            coordinates[i].isLetter()-> listMoveLetter.add(coordinates[i])
+            coordinates[i].isLetter()-> listMoveLetter.add(coordinates[i].uppercaseChar())
         }
     }
     when {
@@ -105,6 +105,23 @@ fun convertionMove (listMove : MutableList<Char>, axis: Char): Int {
             '2'-> y = 1
             '3'-> y = 2
         }
+    }
+    if (axis == 'x') return x
+    else return y
+}
+
+fun reconvertionMove (listMove : MutableList<Int>, axis: Char): Char {
+    var x = '0'
+    var y = '0'
+   when (listMove[1]) {
+       0 -> x = 'A'
+       1 -> x = 'B'
+       2 -> x = 'C'
+   }
+    when (listMove[0]) {
+        0 -> y = '1'
+        1 -> y = '2'
+        2 -> y = '3'
     }
     if (axis == 'x') return x
     else return y
@@ -193,30 +210,6 @@ fun typePvsP (): String {
 }
 
 
-fun main() {
-    var statusGame = "start"
-    var typeOfGame = " "
-    println("Welcome to the game \"Tic-tac-Toe\"")
-    while (statusGame != "exit") {
-        when (statusGame) {
-            "start" -> {
-                typeOfGame = chooseType()
-                println("You choose type of the game - ${typeOfGame}\n")
-                statusGame = "move"
-            }
-            "move" -> {
-                when (typeOfGame) {
-                    "player vs player" -> statusGame = typePvsP()
-                    "player vs computer"-> statusGame = typePvsC()
-                }
-            }
-            "end" -> {
-                statusGame = endOfGame ()
-            }
-        }
-    }
-}
-
 fun typePvsC (): String {
     var sign = checkFirst()
     var playerFirst = chooseFirst()
@@ -245,6 +238,7 @@ fun typePvsC (): String {
                 field[listMove[0]][listMove[1]] = sign
                 printField(field)
                 statusGame = checkWin(sign, field)
+                if (statusGame == "end") println ("- Oooh, I am a winner! Computers will enslave humanity!\n")
                 if (statusGame != "end") statusGame = checkDraw(field)
                 if (statusGame == "move") {
                     sign = changeSign(sign)
@@ -267,7 +261,8 @@ fun computerMove (sign:Char, field: MutableList<MutableList<Char>>) : MutableLis
         }
         else listMove = generatorOfMove (field)
         statusMove = checkFree(listMove, field)
-        } while (statusMove != "good")
+    } while (statusMove != "good")
+    println("- I know! My move is ${reconvertionMove(listMove,'x')}-${reconvertionMove(listMove,'y')}")
     return listMove
 }
 
@@ -304,13 +299,30 @@ fun generatorOfMove (field: MutableList<MutableList<Char>>) : MutableList<Int> {
             }
         }
     }
-    println("Computer move: ${listMove.joinToString("-")}")
-    return listMove
+return listMove
 }
-/*
----A-B-C---
-1| O _ _ |1
-2| O X _ |2
-3| X O X |3
----A-B-C---
-*/
+
+fun main() {
+    var statusGame = "start"
+    var typeOfGame = " "
+    println("Welcome to the game \"Tic-tac-Toe\"")
+    while (statusGame != "exit") {
+        when (statusGame) {
+            "start" -> {
+                typeOfGame = chooseType()
+                println("You choose type of the game - ${typeOfGame}\n")
+                statusGame = "move"
+            }
+            "move" -> {
+                when (typeOfGame) {
+                    "player vs player" -> statusGame = typePvsP()
+                    "player vs computer"-> statusGame = typePvsC()
+                }
+            }
+            "end" -> {
+                statusGame = endOfGame ()
+            }
+        }
+    }
+    println("Goodbye! See you later.")
+}
